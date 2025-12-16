@@ -1,616 +1,741 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KPI Calculator</title>
-  <style>
-    :root{
-      --bg: #0b1020;
-      --card: rgba(255,255,255,0.06);
-      --card2: rgba(255,255,255,0.08);
-      --line: rgba(255,255,255,0.10);
-      --text: rgba(255,255,255,0.92);
-      --muted: rgba(255,255,255,0.65);
-      --brand: #6ae4ff;
-      --brand2:#a78bfa;
-      --good:#34d399;
-      --bad:#fb7185;
-      --shadow: 0 18px 60px rgba(0,0,0,0.45);
-      --radius: 18px;
-    }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KPI Calculator</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --card: rgba(255, 255, 255, 0.06);
+        --card2: rgba(255, 255, 255, 0.08);
+        --line: rgba(255, 255, 255, 0.1);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.65);
+        --brand: #6ae4ff;
+        --brand2: #a78bfa;
+        --good: #34d399;
+        --bad: #fb7185;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+        --radius: 18px;
+      }
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color: var(--text);
-      background:
-        radial-gradient(900px 500px at 15% 10%, rgba(106,228,255,0.20), transparent 60%),
-        radial-gradient(900px 500px at 85% 15%, rgba(167,139,250,0.22), transparent 60%),
-        radial-gradient(1000px 700px at 50% 90%, rgba(52,211,153,0.10), transparent 65%),
-        var(--bg);
-      min-height: 100vh;
-    }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        background: radial-gradient(
+            900px 500px at 15% 10%,
+            rgba(106, 228, 255, 0.2),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 500px at 85% 15%,
+            rgba(167, 139, 250, 0.22),
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 700px at 50% 90%,
+            rgba(52, 211, 153, 0.1),
+            transparent 65%
+          ),
+          var(--bg);
+        min-height: 100vh;
+      }
 
-    .wrap{
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 28px 18px 40px;
-    }
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
 
-    .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom: 18px;
-    }
+      .top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
 
-    .title{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
+      .title {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
 
-    h1{
-      margin:0;
-      font-size: 22px;
-      letter-spacing: -0.02em;
-      font-weight: 750;
-    }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.02em;
+        font-weight: 750;
+      }
 
-    .sub{
-      margin:0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
 
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-      white-space:nowrap;
-    }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
 
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: var(--good);
-      box-shadow: 0 0 0 4px rgba(52,211,153,0.15);
-    }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--good);
+        box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.15);
+      }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-    @media (max-width: 900px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .card{
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
 
-    .cardHeader{
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
+      .cardHeader {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.06),
+          transparent
+        );
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
 
-    .cardHeader h2{
-      margin:0;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: rgba(255,255,255,0.85);
-      text-transform: uppercase;
-    }
+      .cardHeader h2 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: rgba(255, 255, 255, 0.85);
+        text-transform: uppercase;
+      }
 
-    .cardBody{ padding: 16px; }
+      .cardBody {
+        padding: 16px;
+      }
 
-    .drop{
-      border: 1.8px dashed rgba(255,255,255,0.26);
-      background: rgba(255,255,255,0.04);
-      border-radius: 16px;
-      padding: 18px;
-      min-height: 150px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      transition: 0.18s ease;
-      cursor: pointer;
-      position:relative;
-    }
-    .drop.dragover{
-      border-color: var(--brand);
-      background: rgba(106,228,255,0.06);
-      transform: translateY(-1px);
-    }
+      .drop {
+        border: 1.8px dashed rgba(255, 255, 255, 0.26);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 18px;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        transition: 0.18s ease;
+        cursor: pointer;
+        position: relative;
+      }
+      .drop.dragover {
+        border-color: var(--brand);
+        background: rgba(106, 228, 255, 0.06);
+        transform: translateY(-1px);
+      }
 
-    .dropInner{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-      max-width: 460px;
-    }
+      .dropInner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        max-width: 460px;
+      }
 
-    .icon{
-      width:46px;height:46px;border-radius:14px;
-      background: linear-gradient(135deg, rgba(106,228,255,0.20), rgba(167,139,250,0.16));
-      border: 1px solid rgba(255,255,255,0.12);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow: 0 14px 30px rgba(0,0,0,0.25);
-    }
-    .icon svg{ opacity:0.9; }
+      .icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: linear-gradient(
+          135deg,
+          rgba(106, 228, 255, 0.2),
+          rgba(167, 139, 250, 0.16)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+      }
+      .icon svg {
+        opacity: 0.9;
+      }
 
-    .dropTitle{
-      font-weight: 750;
-      letter-spacing:-0.01em;
-      margin:0;
-      font-size: 15px;
-    }
+      .dropTitle {
+        font-weight: 750;
+        letter-spacing: -0.01em;
+        margin: 0;
+        font-size: 15px;
+      }
 
-    .dropHint{
-      margin:0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
+      .dropHint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.4;
+      }
 
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top: 14px;
-      align-items:center;
-      justify-content:space-between;
-    }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+        align-items: center;
+        justify-content: space-between;
+      }
 
-    .btnRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+      .btnRow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-    button{
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.92);
-      padding: 10px 12px;
-      font-weight: 650;
-      font-size: 13px;
-      cursor:pointer;
-      transition: 0.15s ease;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
-    button:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.10); }
-    button:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+      button {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.92);
+        padding: 10px 12px;
+        font-weight: 650;
+        font-size: 13px;
+        cursor: pointer;
+        transition: 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      button:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.1);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
 
-    .primary{
-      background: linear-gradient(135deg, rgba(106,228,255,0.22), rgba(167,139,250,0.18));
-      border-color: rgba(255,255,255,0.18);
-    }
+      .primary {
+        background: linear-gradient(
+          135deg,
+          rgba(106, 228, 255, 0.22),
+          rgba(167, 139, 250, 0.18)
+        );
+        border-color: rgba(255, 255, 255, 0.18);
+      }
 
-    .filePill{
-      color: rgba(255,255,255,0.82);
-      font-size: 12px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      max-width: 520px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
+      .filePill {
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        max-width: 520px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-    input[type="file"]{ display:none; }
+      input[type="file"] {
+        display: none;
+      }
 
-    .status{
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05);
-      color: rgba(255,255,255,0.82);
-      font-size: 13px;
-      line-height: 1.35;
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .status .badgeIcon{
-      width:22px;height:22px;border-radius:8px;
-      display:flex;align-items:center;justify-content:center;
-      flex: 0 0 auto;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-    .status.good{ border-color: rgba(52,211,153,0.25); background: rgba(52,211,153,0.06); }
-    .status.bad { border-color: rgba(251,113,133,0.25); background: rgba(251,113,133,0.06); }
+      .status {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 13px;
+        line-height: 1.35;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .status .badgeIcon {
+        width: 22px;
+        height: 22px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .status.good {
+        border-color: rgba(52, 211, 153, 0.25);
+        background: rgba(52, 211, 153, 0.06);
+      }
+      .status.bad {
+        border-color: rgba(251, 113, 133, 0.25);
+        background: rgba(251, 113, 133, 0.06);
+      }
 
-    .helpList{
-      margin:0; padding-left: 16px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .helpList li{ margin: 6px 0; }
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.85);
-    }
+      .helpList {
+        margin: 0;
+        padding-left: 16px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .helpList li {
+        margin: 6px 0;
+      }
+      .kbd {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.85);
+      }
 
-    /* Results table */
-    .tableWrap{
-      max-height: 520px;
-      overflow:auto;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.16);
-    }
+      /* Results table */
+      .tableWrap {
+        max-height: 520px;
+        overflow: auto;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.16);
+      }
 
-    table{
-      width:100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 13px;
-    }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 13px;
+      }
 
-    thead th{
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-      padding: 10px 10px;
-      text-align: left;
-      color: rgba(255,255,255,0.85);
-      font-weight: 750;
-      letter-spacing: 0.01em;
-    }
+      thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: rgba(15, 23, 42, 0.92);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 10px;
+        text-align: left;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 750;
+        letter-spacing: 0.01em;
+      }
 
-    tbody td{
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.90);
-      vertical-align: top;
-    }
+      tbody td {
+        padding: 10px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.9);
+        vertical-align: top;
+      }
 
-    tbody tr:hover td{
-      background: rgba(255,255,255,0.04);
-    }
+      tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.04);
+      }
 
-    td.num, th.num{
-      text-align:right;
-      font-variant-numeric: tabular-nums;
-    }
+      td.num,
+      th.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
 
-    th.kpiCol{ width: 320px; }
-    @media (max-width: 560px){
-      th.kpiCol{ width: 220px; }
-    }
+      th.kpiCol {
+        width: 320px;
+      }
+      @media (max-width: 560px) {
+        th.kpiCol {
+          width: 220px;
+        }
+      }
 
-    .weekCol{
-      box-shadow: inset 0 0 0 1px rgba(106,228,255,0.22);
-      background: rgba(106,228,255,0.06);
-    }
+      .weekCol {
+        box-shadow: inset 0 0 0 1px rgba(106, 228, 255, 0.22);
+        background: rgba(106, 228, 255, 0.06);
+      }
 
-    .footerNote{
-      margin-top: 10px;
-      color: rgba(255,255,255,0.55);
-      font-size: 12px;
-      line-height: 1.5;
-    }
+      .footerNote {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        line-height: 1.5;
+      }
 
-    .link{
-      color: rgba(106,228,255,0.9);
-      text-decoration: none;
-    }
-    .link:hover{ text-decoration: underline; }
-  </style>
-</head>
+      .link {
+        color: rgba(106, 228, 255, 0.9);
+        text-decoration: none;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="wrap">
-    <div class="top">
-      <div class="title">
-        <h1>Patient CSV KPI Calculator</h1>
-        <p class="sub">
-          Upload a CSV to compute daily KPIs and <b>WEEK_AVG</b>.
-          Files are processed in memory and not stored.
-        </p>
-      </div>
-      <div class="badge">
-        <span class="dot"></span>
-        Server ready
-      </div>
-    </div>
-
-    <div class="grid">
-      <!-- Upload card -->
-      <div class="card">
-        <div class="cardHeader">
-          <h2>Upload CSV</h2>
-          <span class="filePill" id="filePill">No file selected</span>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <div class="title">
+          <h1>Patient CSV KPI Calculator</h1>
+          <p class="sub">
+            Upload a CSV to compute daily KPIs and <b>WEEK_AVG</b>. Files are
+            processed in memory and not stored.
+          </p>
         </div>
+        <div class="badge">
+          <span class="dot"></span>
+          Server ready
+        </div>
+      </div>
 
-        <div class="cardBody">
-          <div id="dropzone" class="drop" role="button" tabindex="0" aria-label="Drop CSV here or click to choose file">
-            <div class="dropInner">
-              <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3v10" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M8 7l4-4 4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M4 14v4a3 3 0 003 3h10a3 3 0 003-3v-4" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <p class="dropTitle">Drag & drop your CSV here</p>
-              <p class="dropHint">
-                Or click to select a file. Recommended: <span class="kbd">.csv</span> exported from the patient page.
-              </p>
-            </div>
+      <div class="grid">
+        <!-- Upload card -->
+        <div class="card">
+          <div class="cardHeader">
+            <h2>Upload CSV</h2>
+            <span class="filePill" id="filePill">No file selected</span>
           </div>
 
-          <div class="row">
-            <div class="btnRow">
-              <label for="fileInput">
-                <button class="primary" type="button">
-                  Choose file
+          <div class="cardBody">
+            <div
+              id="dropzone"
+              class="drop"
+              role="button"
+              tabindex="0"
+              aria-label="Drop CSV here or click to choose file"
+            >
+              <div class="dropInner">
+                <div class="icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 3v10"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M8 7l4-4 4 4"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M4 14v4a3 3 0 003 3h10a3 3 0 003-3v-4"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <p class="dropTitle">Drag & drop your CSV here</p>
+                <p class="dropHint">
+                  Or click to select a file. Recommended:
+                  <span class="kbd">.csv</span> exported from the patient page.
+                </p>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="btnRow">
+                <label for="fileInput">
+                  <button class="primary" type="button">Choose file</button>
+                </label>
+                <input id="fileInput" type="file" accept=".csv" />
+                <button id="downloadBtn" type="button" disabled>
+                  Download results (CSV)
                 </button>
-              </label>
-              <input id="fileInput" type="file" accept=".csv" />
-              <button id="downloadBtn" type="button" disabled>
-                Download results (CSV)
+              </div>
+
+              <button id="clearBtn" type="button" title="Clear table">
+                Clear
               </button>
             </div>
 
-            <button id="clearBtn" type="button" title="Clear table">
-              Clear
-            </button>
+            <div id="status" class="status" style="display: none"></div>
           </div>
+        </div>
 
-          <div id="status" class="status" style="display:none;"></div>
+        <!-- Help card -->
+        <div class="card">
+          <div class="cardHeader">
+            <h2>How it works</h2>
+          </div>
+          <div class="cardBody">
+            <ul class="helpList">
+              <li>
+                Upload CSV → KPIs are computed <b>per day</b>, then
+                <b>WEEK_AVG</b> is added.
+              </li>
+              <li>
+                Negative values in OR-cycle components are ignored
+                <b>per cell</b> (treated as missing).
+              </li>
+              <li>
+                Minor discrepancies (around ±1%) may occur due to differences in
+                rounding logic.
+              </li>
+              <li>
+                Outliers are automatically filtered out during the calculation
+                process, which may lead to differences from the analytics
+                results.
+              </li>
+            </ul>
+            <p class="footerNote">Need</p>
+          </div>
         </div>
       </div>
 
-      <!-- Help card -->
+      <!-- Results card -->
       <div class="card">
         <div class="cardHeader">
-          <h2>How it works</h2>
+          <h2>Results</h2>
+          <span class="footerNote" id="metaNote"></span>
         </div>
         <div class="cardBody">
-          <ul class="helpList">
-            <li>Upload CSV → KPIs are computed <b>per day</b>, then <b>WEEK_AVG</b> is added.</li>
-            <li>Negative values in OR-cycle components are ignored <b>per cell</b> (treated as missing).</li>
-            <li>Numbers are aligned right for readability, and <b>WEEK_AVG</b> is highlighted.</li>
-          </ul>
-          <p class="footerNote">
-            Need UI changes (filters, export XLSX, charts)? Tell me what you want.
-          </p>
+          <div id="out" class="tableWrap"></div>
         </div>
       </div>
+
+      <p class="footerNote">
+        Tip: If the page looks stale after restarting the server, use
+        <span class="kbd">⌘</span> + <span class="kbd">Shift</span> +
+        <span class="kbd">R</span>.
+      </p>
     </div>
 
-    <!-- Results card -->
-    <div class="card">
-      <div class="cardHeader">
-        <h2>Results</h2>
-        <span class="footerNote" id="metaNote"></span>
-      </div>
-      <div class="cardBody">
-        <div id="out" class="tableWrap"></div>
-      </div>
-    </div>
+    <script>
+      const dz = document.getElementById("dropzone");
+      const out = document.getElementById("out");
+      const statusBox = document.getElementById("status");
+      const fileInput = document.getElementById("fileInput");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const filePill = document.getElementById("filePill");
+      const metaNote = document.getElementById("metaNote");
 
-    <p class="footerNote">
-      Tip: If the page looks stale after restarting the server, use <span class="kbd">⌘</span> + <span class="kbd">Shift</span> + <span class="kbd">R</span>.
-    </p>
-  </div>
+      let lastResult = null; // { index, columns, data }
+      let lastFilename = null;
 
-  <script>
-    const dz = document.getElementById("dropzone");
-    const out = document.getElementById("out");
-    const statusBox = document.getElementById("status");
-    const fileInput = document.getElementById("fileInput");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const clearBtn = document.getElementById("clearBtn");
-    const filePill = document.getElementById("filePill");
-    const metaNote = document.getElementById("metaNote");
-
-    let lastResult = null; // { index, columns, data }
-    let lastFilename = null;
-
-    function setStatus(type, text){
-      statusBox.style.display = "flex";
-      statusBox.className = "status " + (type === "bad" ? "bad" : "good");
-      const icon = type === "bad"
-        ? "⚠️"
-        : "✅";
-      statusBox.innerHTML = `
+      function setStatus(type, text) {
+        statusBox.style.display = "flex";
+        statusBox.className = "status " + (type === "bad" ? "bad" : "good");
+        const icon = type === "bad" ? "⚠️" : "✅";
+        statusBox.innerHTML = `
         <div class="badgeIcon">${icon}</div>
         <div>${escapeHtml(text)}</div>
       `;
-    }
-
-    function clearStatus(){
-      statusBox.style.display = "none";
-      statusBox.innerHTML = "";
-    }
-
-    function escapeHtml(s){
-      return s.replace(/[&<>"']/g, (m) => ({
-        "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#039;"
-      }[m]));
-    }
-
-    function isNumericLike(v){
-      if (v === null || v === undefined) return false;
-      const s = String(v).trim();
-      if (s === "") return false;
-      return !isNaN(Number(s));
-    }
-
-    async function uploadFile(file){
-      clearStatus();
-      out.innerHTML = "";
-      metaNote.textContent = "";
-      downloadBtn.disabled = true;
-      lastResult = null;
-      lastFilename = file.name;
-
-      filePill.textContent = file.name;
-
-      setStatus("good", `Uploading <b>${file.name}</b> and computing KPIs...`);
-
-      const form = new FormData();
-      form.append("file", file);
-
-      let res, json;
-      try{
-        res = await fetch("/api/kpi", { method: "POST", body: form });
-        json = await res.json();
-      }catch(e){
-        setStatus("bad", "Network error. Is the server running?");
-        return;
       }
 
-      if (!res.ok){
-        setStatus("bad", json?.error || "Upload failed.");
-        return;
+      function clearStatus() {
+        statusBox.style.display = "none";
+        statusBox.innerHTML = "";
       }
 
-      lastResult = json;
-      renderTable(json.index, json.columns, json.data);
-      downloadBtn.disabled = false;
-
-      const dayCount = json.columns.filter(c => c !== "WEEK_AVG").length;
-      metaNote.textContent = `Days: ${dayCount} • Columns: ${json.columns.length}`;
-      setStatus("good", `Done. Computed ${dayCount} day(s) + WEEK_AVG.`);
-    }
-
-    function renderTable(index, columns, data){
-      const headerCells = columns.map(c => {
-        const cls = (c === "WEEK_AVG") ? "num weekCol" : "num";
-        return `<th class="${cls}">${escapeHtml(c)}</th>`;
-      }).join("");
-
-      const header = `<tr><th class="kpiCol">KPI</th>${headerCells}</tr>`;
-
-      const rows = data.map((row, i) => {
-        const tds = row.map((v, j) => {
-          const colName = columns[j];
-          const cls = (isNumericLike(v) ? "num" : "");
-          const weekCls = (colName === "WEEK_AVG") ? "weekCol" : "";
-          const val = (v === null || v === undefined) ? "" : v;
-          return `<td class="${cls} ${weekCls}">${escapeHtml(String(val))}</td>`;
-        }).join("");
-
-        return `<tr><td>${escapeHtml(index[i])}</td>${tds}</tr>`;
-      }).join("");
-
-      out.innerHTML = `<table><thead>${header}</thead><tbody>${rows}</tbody></table>`;
-    }
-
-    function downloadCSV(){
-      if (!lastResult) return;
-
-      const { index, columns, data } = lastResult;
-      const lines = [];
-
-      lines.push(["KPI", ...columns].map(csvEscape).join(","));
-      for (let i = 0; i < index.length; i++){
-        const row = [index[i], ...data[i]].map(v => csvEscape(v ?? ""));
-        lines.push(row.join(","));
+      function escapeHtml(s) {
+        return s.replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;",
+            }[m])
+        );
       }
 
-      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = (lastFilename ? lastFilename.replace(/\.csv$/i, "") : "kpi") + "_results.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function csvEscape(v){
-      const s = String(v);
-      if (s.includes(",") || s.includes("\"") || s.includes("\n")){
-        return `"${s.replace(/"/g, '""')}"`;
+      function isNumericLike(v) {
+        if (v === null || v === undefined) return false;
+        const s = String(v).trim();
+        if (s === "") return false;
+        return !isNaN(Number(s));
       }
-      return s;
-    }
 
-    // Drag & drop
-    dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("dragover"); });
-    dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
-    dz.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dz.classList.remove("dragover");
-      const file = e.dataTransfer.files?.[0];
-      if (!file) return;
-      if (!file.name.toLowerCase().endsWith(".csv")){
-        setStatus("bad", "Please upload a .csv file.");
-        return;
+      async function uploadFile(file) {
+        clearStatus();
+        out.innerHTML = "";
+        metaNote.textContent = "";
+        downloadBtn.disabled = true;
+        lastResult = null;
+        lastFilename = file.name;
+
+        filePill.textContent = file.name;
+
+        setStatus(
+          "good",
+          `Uploading <b>${file.name}</b> and computing KPIs...`
+        );
+
+        const form = new FormData();
+        form.append("file", file);
+
+        let res, json;
+        try {
+          res = await fetch("/api/kpi", { method: "POST", body: form });
+          json = await res.json();
+        } catch (e) {
+          setStatus("bad", "Network error. Is the server running?");
+          return;
+        }
+
+        if (!res.ok) {
+          setStatus("bad", json?.error || "Upload failed.");
+          return;
+        }
+
+        lastResult = json;
+        renderTable(json.index, json.columns, json.data);
+        downloadBtn.disabled = false;
+
+        const dayCount = json.columns.filter((c) => c !== "WEEK_AVG").length;
+        metaNote.textContent = `Days: ${dayCount} • Columns: ${json.columns.length}`;
+        setStatus("good", `Done. Computed ${dayCount} day(s) + WEEK_AVG.`);
       }
-      uploadFile(file);
-    });
 
-    // Click dropzone to open picker
-    dz.addEventListener("click", () => fileInput.click());
-    dz.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") fileInput.click();
-    });
+      function renderTable(index, columns, data) {
+        const headerCells = columns
+          .map((c) => {
+            const cls = c === "WEEK_AVG" ? "num weekCol" : "num";
+            return `<th class="${cls}">${escapeHtml(c)}</th>`;
+          })
+          .join("");
 
-    fileInput.addEventListener("change", () => {
-      const file = fileInput.files?.[0];
-      if (!file) return;
-      uploadFile(file);
-    });
+        const header = `<tr><th class="kpiCol">KPI</th>${headerCells}</tr>`;
 
-    downloadBtn.addEventListener("click", downloadCSV);
+        const rows = data
+          .map((row, i) => {
+            const tds = row
+              .map((v, j) => {
+                const colName = columns[j];
+                const cls = isNumericLike(v) ? "num" : "";
+                const weekCls = colName === "WEEK_AVG" ? "weekCol" : "";
+                const val = v === null || v === undefined ? "" : v;
+                return `<td class="${cls} ${weekCls}">${escapeHtml(
+                  String(val)
+                )}</td>`;
+              })
+              .join("");
 
-    clearBtn.addEventListener("click", () => {
-      out.innerHTML = "";
-      clearStatus();
-      downloadBtn.disabled = true;
-      filePill.textContent = "No file selected";
-      metaNote.textContent = "";
-      lastResult = null;
-      lastFilename = null;
-      fileInput.value = "";
-    });
-  </script>
-</body>
+            return `<tr><td>${escapeHtml(index[i])}</td>${tds}</tr>`;
+          })
+          .join("");
+
+        out.innerHTML = `<table><thead>${header}</thead><tbody>${rows}</tbody></table>`;
+      }
+
+      function downloadCSV() {
+        if (!lastResult) return;
+
+        const { index, columns, data } = lastResult;
+        const lines = [];
+
+        lines.push(["KPI", ...columns].map(csvEscape).join(","));
+        for (let i = 0; i < index.length; i++) {
+          const row = [index[i], ...data[i]].map((v) => csvEscape(v ?? ""));
+          lines.push(row.join(","));
+        }
+
+        const blob = new Blob([lines.join("\n")], {
+          type: "text/csv;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download =
+          (lastFilename ? lastFilename.replace(/\.csv$/i, "") : "kpi") +
+          "_results.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function csvEscape(v) {
+        const s = String(v);
+        if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+          return `"${s.replace(/"/g, '""')}"`;
+        }
+        return s;
+      }
+
+      // Drag & drop
+      dz.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dz.classList.add("dragover");
+      });
+      dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+      dz.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dz.classList.remove("dragover");
+        const file = e.dataTransfer.files?.[0];
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith(".csv")) {
+          setStatus("bad", "Please upload a .csv file.");
+          return;
+        }
+        uploadFile(file);
+      });
+
+      // Click dropzone to open picker
+      dz.addEventListener("click", () => fileInput.click());
+      dz.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") fileInput.click();
+      });
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files?.[0];
+        if (!file) return;
+        uploadFile(file);
+      });
+
+      downloadBtn.addEventListener("click", downloadCSV);
+
+      clearBtn.addEventListener("click", () => {
+        out.innerHTML = "";
+        clearStatus();
+        downloadBtn.disabled = true;
+        filePill.textContent = "No file selected";
+        metaNote.textContent = "";
+        lastResult = null;
+        lastFilename = null;
+        fileInput.value = "";
+      });
+    </script>
+  </body>
 </html>
