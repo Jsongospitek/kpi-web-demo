@@ -594,10 +594,7 @@
 
         filePill.textContent = file.name;
 
-        setStatus(
-          "good",
-          `Uploading <b>${file.name}</b> and computing KPIs...`
-        );
+        setStatus("good", `Uploading ${file.name} and computing KPIs...`);
 
         const form = new FormData();
         form.append("file", file);
